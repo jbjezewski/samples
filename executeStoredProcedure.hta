@@ -1,0 +1,400 @@
+<head>
+<title>Execute Stored Procedure</title>
+<HTA:APPLICATION 
+APPLICATIONNAME="Execute Stored Procedure"
+SCROLL="yes"
+SINGLEINSTANCE="yes"
+WINDOWSTATE="maximize"
+>
+<style>
+BODY {
+    font-family:Calibri;
+    font-size: 18px;
+    color: #E0E0E0;
+    background: #F8F8F8;
+    background-color:white;
+    color:black;
+    }
+.wrapper {
+    text-align: center;
+    }
+button {
+    position: absolute:
+    top: 50%;
+    font-family:Calibri;
+    font-size: 20px;
+    font-weight: normal;
+    }
+hr {
+    text-align: center; 
+    align: center; 
+    color: #383838;
+    }
+span {
+    text-align: center; 
+    align: center;
+    }
+textarea {
+    background-color: #F8F8F8;
+    }
+input {
+    text-align: center; 
+    align: center;
+    background-color: #F8F8F8;
+    }
+</style>
+</head>
+<script language="VBScript">
+
+Sub Window_onLoad
+    window.resizeTo 950,1000
+	Dim width, height
+	width = (screen.width - 950) / 2
+	height = (screen.height - 1000) / 2
+    window.moveTo 500, 10
+	document.getElementById("selectBox").style.visibility = "hidden"
+	document.getElementById("worksheetBox").style.visibility = "hidden"
+	document.getElementById("sp").style.visibility = "hidden"
+	document.getElementById("ws").style.visibility = "hidden"
+	document.getElementById("runbutton").style.visibility = "hidden"
+	Dim newnum
+	newnum = 1
+	document.getElementById("getpar").style.visibility = "hidden"
+			Do While newnum < 6
+				thisid = "span" & newnum
+				thisidt = "param" & newnum
+				document.getElementById(thisid).style.visibility = "hidden"
+				document.getElementById(thisidt).style.visibility = "hidden"
+				newnum = newnum + 1
+			Loop
+End Sub
+
+Sub RunThis
+	document.getElementById("getpar").style.visibility = "visible"
+	document.getElementById("sp").style.visibility = "visible"
+	document.getElementById("ws").style.visibility = "visible"
+	Dim objExcel
+	On Error Resume Next
+	Set objExcel = GetObject(, "Excel.Application")  'attach to running Excel instance
+	If Not TypeName(objExcel) = "Empty" then
+		' MsgBox "Excel Running"    
+	Else 
+		MsgBox "Please make sure your workbook is open first before trying to refresh your data."
+	End If
+	'objExcel.Visible = true
+	
+	' Now we are looking through directories, looking for open excel spreadsheets with ~ at the beginning of the name
+	Dim userName, objNetwork
+	Set objNetwork = CreateObject("Wscript.Network")
+	userName = objNetwork.UserName
+	Dim Folder
+    Dim SubFolder
+    Dim File, SubFile
+    Dim FSO
+	Dim var, extpos, ext
+    Dim CurrentRow
+    Set FSO = CreateObject("Scripting.FileSystemObject")
+    Set Folder = FSO.GetFolder("C:\Users\" & userName & "\Documents\")
+    CurrentRow = 0
+	Dim filenames(100) 'Setting Max of 100 excel files
+    For Each File In Folder.Files
+		On Error Resume Next
+		If Err.number = 0 Then
+			var = InStr(File.Name, "~")
+			ext = FSO.GetExtensionName(File.Path)
+			if var = 1 Then
+				If ext = "xlsx" Or ext = "txt" Or ext = "csv" Then
+					filenames(CurrentRow) = File.Name
+					CurrentRow = CurrentRow + 1
+				End If
+			End If
+		End If
+    Next
+    For Each Folder In Folder.SubFolders
+		On Error Resume Next
+		IF Err.number = 0 Then
+		    For Each File In Folder.Files
+				On Error Resume Next
+				If Err.number = 0 Then
+					var = InStr(File.Name, "~")
+					ext = FSO.GetExtensionName(File.Path)
+					If var = 1 Then
+						If ext = "xlsx" Or ext = "txt" Or ext = "csv" Then
+							filenames(CurrentRow) = File.Name
+							CurrentRow = CurrentRow + 1
+						End If
+					End If
+				End IF
+			Next
+		End If
+    Next
+	Set Folder = FSO.GetFolder("C:\Users\" & userName & "\Downloads\")
+    For Each File In Folder.Files
+		On Error Resume Next
+		If Err.number = 0 Then
+			var = InStr(File.Name, "~")
+			ext = FSO.GetExtensionName(File.Path)
+			if var = 1 Then
+				If ext = "xlsx" Or ext = "txt" Or ext = "csv" Then
+					filenames(CurrentRow) = File.Name
+					CurrentRow = CurrentRow + 1
+				End If
+			End If
+		End If
+    Next
+    For Each Folder In Folder.SubFolders
+		On Error Resume Next
+		IF Err.number = 0 Then
+		    For Each File In Folder.Files
+				On Error Resume Next
+				If Err.number = 0 Then
+					var = InStr(File.Name, "~")
+					ext = FSO.GetExtensionName(File.Path)
+					If var = 1 Then
+						If ext = "xlsx" Or ext = "txt" Or ext = "csv" Then
+							filenames(CurrentRow) = File.Name
+							CurrentRow = CurrentRow + 1
+						End If
+					End If
+				End IF
+			Next
+		End If
+    Next
+	Set Folder = FSO.GetFolder("C:\Users\" & userName & "\Desktop\")
+    For Each File In Folder.Files
+		On Error Resume Next
+		If Err.number = 0 Then
+			var = InStr(File.Name, "~")
+			ext = FSO.GetExtensionName(File.Path)
+			if var = 1 Then
+				If ext = "xlsx" Or ext = "txt" Or ext = "csv" Then
+					filenames(CurrentRow) = File.Name
+					CurrentRow = CurrentRow + 1
+				End If
+			End If
+		End If
+    Next
+    For Each Folder In Folder.SubFolders
+		On Error Resume Next
+		IF Err.number = 0 Then
+		    For Each File In Folder.Files
+				On Error Resume Next
+				If Err.number = 0 Then
+					var = InStr(File.Name, "~")
+					ext = FSO.GetExtensionName(File.Path)
+					If var = 1 Then
+						If ext = "xlsx" Or ext = "txt" Or ext = "csv" Then
+							filenames(CurrentRow) = File.Name
+							CurrentRow = CurrentRow + 1
+						End If
+					End If
+				End IF
+			Next
+		End If
+    Next
+    Set Folder = Nothing
+    Set FSO = Nothing
+	
+	'Now set value of dropdown to be each worksheet in the open workbooks, with the name of the workbook as the value
+		Dim worksheetBoxSize
+		Dim ws, wb
+		For Each filename In filenames
+			If Len(filename) > 0 Then
+				filename = Right(filename, Len(filename) - 2)
+				Set wb = objExcel.Workbooks(filename)
+					For Each worksheet In wb.Worksheets
+						worksheetBoxSize = worksheetBoxSize + 1
+						Set opt = document.createElement("option")
+						opt.Value = filename
+						opt.Text = worksheet.Name
+						worksheetBox.add opt
+					Next
+			End IF
+		Next
+	document.getElementById("worksheetBox").size = worksheetBoxSize
+	Set objConnection = CreateObject("ADODB.Connection")
+	objConnection.Open "Provider={ProviderName};Data Source={Data Source};Initial Catalog={Catalog};User ID={user id};Password={password};"
+	Set objRecordset = CreateObject("ADODB.Recordset")
+	strSQL = "SELECT * FROM INFORMATION_SCHEMA.ROUTINES where ROUTINE_TYPE = 'PROCEDURE'"
+	DIM cmd
+	SET cmd = CreateObject("ADODB.Command")
+	SET cmd.ActiveConnection = objConnection
+	cmd.CommandText = strSQL
+	cmd.CommandType = 1
+	SET objRecordset = cmd.Execute
+	Do Until objRecordset.EOF
+        Set opt = document.createElement("option")
+        opt.Value = objRecordset("SPECIFIC_NAME").value
+        opt.Text = objRecordset("SPECIFIC_NAME").value
+        selectBox.add opt
+		objRecordset.MoveNext
+	Loop 
+	objRecordset.Close
+	objConnection.Close
+	SET cmd = Nothing
+	Set objRecordset.Source = Nothing
+	Set objRecordset.ActiveConnection = Nothing
+	Set objRecordset = Nothing
+	Set objConnection = Nothing
+	document.getElementById("selectBox").style.visibility = "visible"
+	document.getElementById("worksheetBox").style.visibility = "visible"
+End Sub
+
+Sub GetParams
+	document.getElementById("runbutton").style.visibility = "visible"
+	Set objCon = CreateObject("ADODB.Connection")
+	objCon.Open "Provider={ProviderName};Data Source={Data Source};Initial Catalog={Catalog};User ID={user id};Password={password};"
+	Set objRec = CreateObject("ADODB.Recordset")
+	Dim thisProc
+	For Each opt In selectBox.Options
+		If opt.selected Then
+		    thisProc = opt.value
+		End If
+	Next
+	strSQL = "SELECT parameter_name, ordinal_position,parameter_mode,data_type FROM INFORMATION_SCHEMA.parameters WHERE SPECIFIC_NAME = '" & thisProc & "'"
+	DIM cmd
+	SET cmd = CreateObject("ADODB.Command")
+	SET cmd.ActiveConnection = objCon
+	cmd.CommandText = strSQL
+	cmd.CommandType = 1
+	Dim ordervalue
+	ordervalue = 0
+	SET objRec = cmd.Execute
+	Dim numrows, diffrows, idname, thisid
+	numrows = objRec.RecordCount
+	Do Until objRec.EOF
+        If objRec("ORDINAL_POSITION").value = "1" Then
+			span1.innerHTML = "Parameter " & objRec("PARAMETER_NAME").value & ": "
+			span1.value = objRec("PARAMETER_NAME").value
+			document.getElementById("param1").style.visibility = "visible"
+			document.getElementById("span1").style.visibility = "visible"
+		End If
+        If objRec("ORDINAL_POSITION").value = "2" Then
+			span2.innerHTML = "Parameter " & objRec("PARAMETER_NAME").value & ": "
+			span2.value = objRec("PARAMETER_NAME").value
+			document.getElementById("param2").style.visibility = "visible"
+			document.getElementById("span2").style.visibility = "visible"
+		End If
+        If objRec("ORDINAL_POSITION").value = "3" Then
+			span3.innerHTML = "Parameter " & objRec("PARAMETER_NAME").value & ": "
+			span3.value = objRec("PARAMETER_NAME").value
+			document.getElementById("param3").style.visibility = "visible"
+			document.getElementById("span3").style.visibility = "visible"
+		End If
+        If objRec("ORDINAL_POSITION").value = "4" Then
+			span4.innerHTML = "Parameter " & objRec("PARAMETER_NAME").value & ": "
+			span4.value = objRec("PARAMETER_NAME").value
+			document.getElementById("param4").style.visibility = "visible"
+			document.getElementById("span4").style.visibility = "visible"
+		End If
+        If objRec("ORDINAL_POSITION").value = "5" Then
+			span5.innerHTML = "Parameter " & objRec("PARAMETER_NAME").value & ": "
+			span5.value = objRec("PARAMETER_NAME").value
+			document.getElementById("param5").style.visibility = "visible"
+			document.getElementById("span5").style.visibility = "visible"
+		End If
+		objRec.MoveNext
+	Loop 
+	objRec.Close
+	objCon.Close
+	SET cmd = Nothing
+	Set objRec.Source = Nothing
+	Set objRec.ActiveConnection = Nothing
+	Set objRec = Nothing
+	Set objCon = Nothing
+	document.getElementById("selectBox").style.visibility = "visible"
+	document.getElementById("worksheetBox").style.visibility = "visible"
+End Sub
+
+Sub RunProc
+	Dim thisProc, thisSheet, thisWorkbook, objExcel
+	thisProc = ""
+	thisSheet = ""
+	thisWorkbook = ""
+	For Each opt In selectBox.Options
+		If opt.selected Then
+		    thisProc = opt.value
+		End If
+	Next
+	For Each opt In worksheetBox.Options
+		If opt.selected Then
+		    thisWorkbook = opt.value
+			thisSheet = opt.text
+		End If
+	Next
+	
+	'MsgBox thisWorkbook & " is the selected workbook and " & thisSheet & " is the selected sheet" 
+	
+	Set objExcel = GetObject(, "Excel.Application")  'attach to running Excel instance
+	Set wb = objExcel.Workbooks(thisWorkbook)
+	Dim objRS,WshShell,objConn
+	Set WshShell = CreateObject("WScript.Shell")
+	Set objConn = CreateObject("ADODB.Connection")
+	Set objRS = CreateObject("ADODB.Recordset")
+	wb.Worksheets(thisSheet).Activate
+	
+	'the connection used above does not allow to execute stored procedures, the below connection does
+	objConn.Open "driver={SQL Server};server={Server};Initial Catalog={Catalog};User ID={user id};Password={password};"
+
+	DIM cmd
+	SET cmd = CreateObject("ADODB.Command")
+	SET cmd.ActiveConnection = objConn
+    cmd.CommandType = 4 
+	cmd.CommandText = "[dbo].[" & thisProc & "]"   
+	
+	' adding the catalog name in front would give not enough storage error in line 283 for first parameter setting
+	
+	Dim p1,p2,p3,p4,p5
+	p1 = span1.value
+	p2 = span2.value
+	p3 = span3.value
+	p4 = span4.value
+	p5 = span5.value
+	'If p1 <> "" Then	cmd.Parameters(p1) = param1.value End If
+	If param1.value <> "" Then
+		ps1 = CInt(param1.value)
+		cmd.Parameters.Append cmd.CreateParameter(span1.value, 3, 1, 4, ps1)
+	End IF
+	If param2.value <> "" Then
+		ps2 = CInt(param2.value)
+		cmd.Parameters.Append cmd.CreateParameter(span2.value, 3, 1, 4, ps2)
+	End If
+	If param3.value <> "" Then
+		ps3 = CInt(param3.value)
+		cmd.Parameters.Append cmd.CreateParameter(span3.value, 3, 1, 4, ps3)
+	End If
+	If param4.value <> "" Then
+		ps4 = CInt(param4.value)
+		cmd.Parameters.Append cmd.CreateParameter(span4.value, 3, 1, 4, ps4)
+	End If
+	If param5.value <> "" Then
+		ps5 = CInt(param5.value)
+		cmd.Parameters.Append cmd.CreateParameter(span5.value, 3, 1, 4, ps5)
+	End If
+	SET objRS = cmd.Execute
+	If objRS.State <> 0 Then
+		wb.Worksheets(thisSheet).Range("A1").CopyFromRecordset objRS
+	End If
+	objRS.Close
+	objConn.Close
+	SET cmd = Nothing
+	SET wb = Nothing
+	SET objRS = Nothing
+	SET objConn = Nothing
+	SET WshShell = Nothing
+End Sub
+</script>
+<body>
+<div class="wrapper">
+<button style="align: center;" onclick="RunThis">Connect to Retrieve Procedures</button><p>
+<span style="align: center;" id = "sp">Select Stored Procedure: </span><p><select style="align: center;" id="selectBox" name="selectBox" size="15"></select><br /><p>
+<span style="align: center;" id = "ws">Select Worksheet To Refresh:</span><p><select style="align: center;" id="worksheetBox" name="worksheetBox" size="5"></select><br /><p>
+<button style="align: center;" id="getpar" onclick="GetParams">Retrieve Parameters for Selected Procedure</button><p>
+<span style="align: center;" id = "span1" value="">Parameter 1 Value: </span><input style="align: center;" type="text" id = "param1" size="30" style="visibility:hidden"><p>
+<span style="align: center;" id = "span2" value="">Parameter 2 Value: </span><input style="align: center;" type="text" id = "param2" size="30" style="visibility:hidden"><p>
+<span style="align: center;" id = "span3" value="">Parameter 3 Value: </span><input style="align: center;" type="text" id = "param3" size="30" style="visibility:hidden"><p>
+<span style="align: center;" id = "span4" value="">Parameter 4 Value: </span><input style="align: center;" type="text" id = "param4" size="30" style="visibility:hidden"><p>
+<span style="align: center;" id = "span5" value="">Parameter 5 Value: </span><input style="align: center;" type="text" id = "param5" size="30" style="visibility:hidden"><p>
+<button style="align: center;" id = "runbutton" onclick="RunProc">Run Selected Procedure</button><p>
+</div>
+</body>
